@@ -14,6 +14,17 @@ public class Movement : MonoBehaviour
 
     Rigidbody rb;
 
+    public Camera cam;
+
+    public Transform groundCheck;
+    public LayerMask groundLayer;
+
+    public float checkRadius;
+    public float jumpVelocity;
+    public bool isGrounded;
+
+    public bool canJump;
+    public bool jumpTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -25,23 +36,40 @@ public class Movement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        isGrounded = Physics.CheckSphere(groundCheck.transform.position, checkRadius, groundLayer);
+
+        if (canJump)
+        {
+            Jump();
+        }
+
     }
 
     private void FixedUpdate()
     {
         HandleMovement();
     }
+    
 
+
+
+    // CUSTOM FUNCTIONS
     void HandleMovement()
     {
         Vector3 movement = transform.forward * moveInput.y + transform.right * moveInput.x;
-
+        movement.y = 0;
         
 
         rb.AddForce(movement * setVelocity, ForceMode.Acceleration);
 
     }
+
+    void Jump()
+    {
+
+    }
+
+
 
     private void OnEnable()
     {

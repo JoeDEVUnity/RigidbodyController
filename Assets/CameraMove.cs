@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class CameraMove : MonoBehaviour
 {
-
-    public float offsetY;
 
     public Transform player;
 
@@ -15,7 +14,7 @@ public class CameraMove : MonoBehaviour
 
     public float multiplier = .5f;
 
-
+    
     private float verticalRot;
     private float horizontalRot;
 
@@ -37,8 +36,11 @@ public class CameraMove : MonoBehaviour
 
         transform.localRotation = Quaternion.Euler(verticalRot,0, 0);
 
-
+        
     }
+
+
+    
 
 
     void HandleRotation()
