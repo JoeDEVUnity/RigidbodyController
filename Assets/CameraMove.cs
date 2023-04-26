@@ -6,7 +6,7 @@ using Cinemachine;
 public class CameraMove : MonoBehaviour
 {
 
-    public Transform player;
+    public Transform orientation;
 
     public Movement playerScript;
 
@@ -32,9 +32,9 @@ public class CameraMove : MonoBehaviour
 
         HandleRotation();
 
-        player.transform.rotation = Quaternion.Euler(0,horizontalRot,0);
+        transform.rotation = Quaternion.Euler(verticalRot,horizontalRot,0);
 
-        transform.localRotation = Quaternion.Euler(verticalRot,0, 0);
+        orientation.transform.localRotation = Quaternion.Euler(verticalRot,horizontalRot, 0);
 
         
     }

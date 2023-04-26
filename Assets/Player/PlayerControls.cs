@@ -44,6 +44,24 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Jumping"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""4c734876-8ded-49c5-94af-fa07a7f4852d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Sprinting"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""86b8a054-3125-44e8-89ca-854d68e30905"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -112,6 +130,28 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""852e6dbb-b0b6-48e3-a131-1fbb1927c078"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jumping"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""02d3f813-73f5-40c5-85d8-a229a4d45008"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Sprinting"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -122,6 +162,8 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         m_Controls = asset.FindActionMap("Controls", throwIfNotFound: true);
         m_Controls_Movement = m_Controls.FindAction("Movement", throwIfNotFound: true);
         m_Controls_Mouse = m_Controls.FindAction("Mouse", throwIfNotFound: true);
+        m_Controls_Jumping = m_Controls.FindAction("Jumping", throwIfNotFound: true);
+        m_Controls_Sprinting = m_Controls.FindAction("Sprinting", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -183,12 +225,16 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     private IControlsActions m_ControlsActionsCallbackInterface;
     private readonly InputAction m_Controls_Movement;
     private readonly InputAction m_Controls_Mouse;
+    private readonly InputAction m_Controls_Jumping;
+    private readonly InputAction m_Controls_Sprinting;
     public struct ControlsActions
     {
         private @PlayerControls m_Wrapper;
         public ControlsActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_Controls_Movement;
         public InputAction @Mouse => m_Wrapper.m_Controls_Mouse;
+        public InputAction @Jumping => m_Wrapper.m_Controls_Jumping;
+        public InputAction @Sprinting => m_Wrapper.m_Controls_Sprinting;
         public InputActionMap Get() { return m_Wrapper.m_Controls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -204,6 +250,12 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @Mouse.started -= m_Wrapper.m_ControlsActionsCallbackInterface.OnMouse;
                 @Mouse.performed -= m_Wrapper.m_ControlsActionsCallbackInterface.OnMouse;
                 @Mouse.canceled -= m_Wrapper.m_ControlsActionsCallbackInterface.OnMouse;
+                @Jumping.started -= m_Wrapper.m_ControlsActionsCallbackInterface.OnJumping;
+                @Jumping.performed -= m_Wrapper.m_ControlsActionsCallbackInterface.OnJumping;
+                @Jumping.canceled -= m_Wrapper.m_ControlsActionsCallbackInterface.OnJumping;
+                @Sprinting.started -= m_Wrapper.m_ControlsActionsCallbackInterface.OnSprinting;
+                @Sprinting.performed -= m_Wrapper.m_ControlsActionsCallbackInterface.OnSprinting;
+                @Sprinting.canceled -= m_Wrapper.m_ControlsActionsCallbackInterface.OnSprinting;
             }
             m_Wrapper.m_ControlsActionsCallbackInterface = instance;
             if (instance != null)
@@ -214,6 +266,12 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @Mouse.started += instance.OnMouse;
                 @Mouse.performed += instance.OnMouse;
                 @Mouse.canceled += instance.OnMouse;
+                @Jumping.started += instance.OnJumping;
+                @Jumping.performed += instance.OnJumping;
+                @Jumping.canceled += instance.OnJumping;
+                @Sprinting.started += instance.OnSprinting;
+                @Sprinting.performed += instance.OnSprinting;
+                @Sprinting.canceled += instance.OnSprinting;
             }
         }
     }
@@ -222,5 +280,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnMouse(InputAction.CallbackContext context);
+        void OnJumping(InputAction.CallbackContext context);
+        void OnSprinting(InputAction.CallbackContext context);
     }
 }
