@@ -49,8 +49,12 @@ public class Movement : MonoBehaviour
     public float wallDistance;
     public float forceMultiplier, wallJumpForce, jumpWallForce;
 
+    private float wallJumpTimer;
 
     public int wallJump;
+
+    private float jumpValue;
+
 
     Ray wallLeftRay;
     Ray wallRightRay;
@@ -70,7 +74,7 @@ public class Movement : MonoBehaviour
     void Update()
     {
         playerHeight = transform.localScale.y;
-
+        wallJumpTimer += Time.deltaTime;
         
         Detections();
         HandleDrag();
@@ -87,73 +91,6 @@ public class Movement : MonoBehaviour
     
 
 
-    // CUSTOM FUNCTIONS
-    void HandleMovement()
-    {
-
-        movement = orientation.transform.forward * moveInput.y + orientation.transform.right * moveInput.x;
-        movement.y = 0;
-        
-
-        if(!isGrounded && SlopeCheck())
-        {
-            rb.AddForce((slopeMovement * setVelocity) * movementMultiplier, ForceMode.Acceleration);
-        }
-        else if (!isGrounded)
-        {
-            rb.AddForce((movement * setVelocity) * movementMultiplier * airMultiplier, ForceMode.Acceleration);
-        }
-        else
-        {
-            rb.AddForce((movement * setVelocity) * movementMultiplier, ForceMode.Acceleration);
-        }
-
-        if (wallLeft && !isGrounded)
-        {
-            wallJump = 1;
-            rb.useGravity = false;
-            Debug.Log("touching Left wall");
-            rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
-            if (moveInput.y > 0)
-            {
-                rb.AddForce(orientation.transform.forward * 2 * forceMultiplier, ForceMode.Acceleration);
-            }
-            if (playerControls.Controls.Jumping.triggered)
-            {
-                Debug.Log("JUMPING LEFT WALL");
-
-                rb.AddForce(wallLeftRayOut.normal * wallJumpForce, ForceMode.Force);
-                rb.AddForce(Vector3.up * jumpWallForce, ForceMode.Impulse);
-            }
-        }
-        else if (wallRight && !isGrounded)
-        {
-            wallJump = 1;
-            rb.useGravity = false;
-            Debug.Log("touching Right wall");
-            rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
-            if (moveInput.y > 0)
-            {
-                rb.AddForce(orientation.transform.forward * 2 * forceMultiplier, ForceMode.Acceleration);
-            }
-
-            // Handle wall jumping force jump
-
-            if (playerControls.Controls.Jumping.triggered)
-            {
-                Debug.Log("JUMPING RIGHT WALL ");
-
-                rb.AddForce(wallRightRayOut.normal * wallJumpForce, ForceMode.Force);
-                rb.AddForce(Vector3.up * jumpWallForce, ForceMode.Impulse);
-            }
-
-        } 
-        else
-        {
-            rb.useGravity = true;
-        }
-
-    }
 
 
     void HandleDrag()
@@ -207,7 +144,7 @@ public class Movement : MonoBehaviour
         // Jumping
         isGrounded = Physics.CheckSphere(groundCheck.transform.position, checkRadius, groundLayer);
         
-        if(playerControls.Controls.Jumping.triggered && (isGrounded || SlopeCheck())) // Only jump if grounded
+        if(jumpValue > 0 && (isGrounded || SlopeCheck())) // Only jump if grounded
         {
             canJump = true;
         }
@@ -238,6 +175,72 @@ public class Movement : MonoBehaviour
     }
 
 
+    void HandleMovement()
+    {
+
+        movement = orientation.transform.forward * moveInput.y + orientation.transform.right * moveInput.x;
+        movement.y = 0;
+        
+
+        if(!isGrounded && SlopeCheck())
+        {
+            rb.AddForce((slopeMovement * setVelocity) * movementMultiplier, ForceMode.Acceleration);
+        }
+        else if (!isGrounded)
+        {
+            rb.AddForce((movement * setVelocity) * movementMultiplier * airMultiplier, ForceMode.VelocityChange);
+        }
+        else
+        {
+            rb.AddForce((movement * setVelocity) * movementMultiplier, ForceMode.Acceleration);
+        }
+
+        if (wallLeft && !isGrounded)
+        {
+            rb.useGravity = false;
+            Debug.Log("touching Left wall");
+            rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
+            if (moveInput.y > 0)
+            {
+                rb.AddForce(orientation.transform.forward * 2 * forceMultiplier, ForceMode.Acceleration);
+            }
+            if (jumpValue > 0 && wallJumpTimer > 0.1f)
+            {
+                Debug.Log("JUMPING LEFT WALL");
+
+                rb.AddForce(orientation.transform.right * wallJumpForce, ForceMode.Impulse);
+                rb.AddForce(Vector3.up * jumpWallForce, ForceMode.Impulse);
+                wallJumpTimer = 0f;
+            }
+        }
+        else if (wallRight && !isGrounded)
+        {
+            rb.useGravity = false;
+            Debug.Log("touching Right wall");
+            rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
+            if (moveInput.y > 0)
+            {
+                rb.AddForce(orientation.transform.forward * 2 * forceMultiplier, ForceMode.Acceleration);
+            }
+
+            // Handle wall jumping force jump
+
+            if (jumpValue > 0 && wallJumpTimer > 0.1f)
+            {
+                Debug.Log("JUMPING RIGHT WALL ");
+
+                rb.AddForce(-orientation.transform.right * wallJumpForce, ForceMode.Impulse);
+                rb.AddForce(Vector3.up * jumpWallForce, ForceMode.Impulse);
+                wallJumpTimer = 0f;
+            }
+
+        } 
+        else
+        {
+            rb.useGravity = true;
+        }
+
+    }
     void Jump()
     {
         rb.velocity = new Vector3(rb.velocity.x, jumpVelocity, rb.velocity.z);
@@ -254,7 +257,7 @@ public class Movement : MonoBehaviour
             playerControls.Controls.Mouse.performed += i => mouseInput = i.ReadValue<Vector2>();
             playerControls.Controls.Movement.performed += i => moveInput = i.ReadValue<Vector2>();
             playerControls.Controls.Sprinting.performed += i => isSprinting = i.ReadValue<float>();
-
+            playerControls.Controls.Jumping.performed += i => jumpValue = i.ReadValue<float>();
 
             playerControls.Enable();
         }
