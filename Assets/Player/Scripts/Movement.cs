@@ -45,13 +45,19 @@ public class Movement : MonoBehaviour
 
     private float playerHeight;
 
+    public bool wallLeft, wallRight;
+    public float wallDistance;
+    public float forceMultiplier, wallJumpForce, jumpWallForce;
+
+
+    public int wallJump;
+
+    Ray wallLeftRay;
+    Ray wallRightRay;
     RaycastHit slopeHit;
 
-
-    public float wallRayDist, wallRadius;
-    private bool collisionLeftWall, collisionRightWall;
-
-    public Transform wallLeft, wallRight;
+    RaycastHit wallLeftRayOut;
+    RaycastHit wallRightRayOut;
 
     // Start is called before the first frame update
     void Start()
@@ -88,18 +94,65 @@ public class Movement : MonoBehaviour
         movement = orientation.transform.forward * moveInput.y + orientation.transform.right * moveInput.x;
         movement.y = 0;
         
-        if(isGrounded && !SlopeCheck())
-        {
-            rb.AddForce((movement * setVelocity) * movementMultiplier, ForceMode.Acceleration);
-        }
-        else if(!isGrounded && SlopeCheck())
+
+        if(!isGrounded && SlopeCheck())
         {
             rb.AddForce((slopeMovement * setVelocity) * movementMultiplier, ForceMode.Acceleration);
         }
-        else
+        else if (!isGrounded)
         {
             rb.AddForce((movement * setVelocity) * movementMultiplier * airMultiplier, ForceMode.Acceleration);
         }
+        else
+        {
+            rb.AddForce((movement * setVelocity) * movementMultiplier, ForceMode.Acceleration);
+        }
+
+        if (wallLeft && !isGrounded)
+        {
+            wallJump = 1;
+            rb.useGravity = false;
+            Debug.Log("touching Left wall");
+            rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
+            if (moveInput.y > 0)
+            {
+                rb.AddForce(orientation.transform.forward * 2 * forceMultiplier, ForceMode.Acceleration);
+            }
+            if (playerControls.Controls.Jumping.triggered)
+            {
+                Debug.Log("JUMPING LEFT WALL");
+
+                rb.AddForce(wallLeftRayOut.normal * wallJumpForce, ForceMode.Force);
+                rb.AddForce(Vector3.up * jumpWallForce, ForceMode.Impulse);
+            }
+        }
+        else if (wallRight && !isGrounded)
+        {
+            wallJump = 1;
+            rb.useGravity = false;
+            Debug.Log("touching Right wall");
+            rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
+            if (moveInput.y > 0)
+            {
+                rb.AddForce(orientation.transform.forward * 2 * forceMultiplier, ForceMode.Acceleration);
+            }
+
+            // Handle wall jumping force jump
+
+            if (playerControls.Controls.Jumping.triggered)
+            {
+                Debug.Log("JUMPING RIGHT WALL ");
+
+                rb.AddForce(wallRightRayOut.normal * wallJumpForce, ForceMode.Force);
+                rb.AddForce(Vector3.up * jumpWallForce, ForceMode.Impulse);
+            }
+
+        } 
+        else
+        {
+            rb.useGravity = true;
+        }
+
     }
 
 
@@ -171,53 +224,19 @@ public class Movement : MonoBehaviour
         // Slope
         slopeMovement = Vector3.ProjectOnPlane(movement, slopeHit.normal);
 
-        // Wall Jumping
-        if (Physics.CheckSphere(wallRight.transform.position, wallRadius, wallLayer) && !isGrounded)
-        {
-            collisionLeftWall = true;
-        } else if(Physics.CheckSphere(wallLeft.transform.position, wallRadius, wallLayer) && !isGrounded)
-        {
-            collisionRightWall = true;
-        }
-        else
-        {
-            collisionRightWall = false;
-            collisionLeftWall = false;
-        }
 
-      
+        // Wall Check
 
-        // Wall run
-        if (collisionLeftWall)
-        {
-            WallRun();
-            
-        } else if (collisionRightWall)
-        {
-            WallRun();
-        }
+        wallLeftRay = new Ray(orientation.transform.position, -orientation.transform.right);
+
+        wallRightRay = new Ray(orientation.transform.position, orientation.transform.right);
+
+
+        wallLeft = Physics.Raycast(wallLeftRay, out wallLeftRayOut, wallDistance, wallLayer);
+        wallRight = Physics.Raycast(wallRightRay, out wallRightRayOut, wallDistance, wallLayer);
+
     }
 
-    void WallRun()
-    {
-        rb.useGravity = false;
-
-        rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
-
-        if (playerControls.Controls.Jumping.triggered)
-        {
-            if (collisionLeftWall)
-            {
-                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-                rb.AddForce(-orientation.transform.right * 100f, ForceMode.Force);
-            } 
-            else if (collisionRightWall)
-            {
-                rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
-                rb.AddForce(orientation.transform.right * 100f, ForceMode.Force);
-            }
-        }
-    }
 
     void Jump()
     {
@@ -250,10 +269,8 @@ public class Movement : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireSphere(groundCheck.position, checkRadius);
-        Gizmos.DrawWireSphere(wallLeft.position, wallRadius);
-        Gizmos.DrawWireSphere(wallRight.position, wallRadius);
-
-
+        Gizmos.DrawRay(wallLeftRay.origin, wallLeftRay.direction * wallDistance);
+        Gizmos.DrawRay(wallRightRay.origin, wallRightRay.direction * wallDistance);
     }
 
 }
