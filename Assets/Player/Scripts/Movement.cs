@@ -11,6 +11,8 @@ public class Movement : MonoBehaviour
     public Vector3 slopeMovement;
 
     private Vector3 movement;
+    public float isSwitching { get; private set; }
+    public float fireValue { get; private set; }
 
     public float dragForce = 6f;
 
@@ -54,7 +56,6 @@ public class Movement : MonoBehaviour
     public int wallJump;
 
     private float jumpValue;
-
 
     Ray wallLeftRay;
     Ray wallRightRay;
@@ -258,6 +259,9 @@ public class Movement : MonoBehaviour
             playerControls.Controls.Movement.performed += i => moveInput = i.ReadValue<Vector2>();
             playerControls.Controls.Sprinting.performed += i => isSprinting = i.ReadValue<float>();
             playerControls.Controls.Jumping.performed += i => jumpValue = i.ReadValue<float>();
+
+            playerControls.Controls.Switching.performed += i => isSwitching = i.ReadValue<float>();
+            playerControls.Controls.FireValue.performed += i => fireValue = i.ReadValue<float>();
 
             playerControls.Enable();
         }

@@ -22,7 +22,10 @@ public class Intelligence : MonoBehaviour
     public LayerMask playerLayer;
     public GameObject player;
 
-    public GameObject eyes;
+    public GameObject main, objectOfRotation;
+    public float speedOfRotation = 10f;
+
+    private int startPoint;
 
     public List<GameObject> wanderPoints = new List<GameObject>();
 
@@ -31,10 +34,13 @@ public class Intelligence : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        materialRenderer = GetComponent<Renderer>();
+        materialRenderer = main.GetComponent<Renderer>();
         passiveColor = materialRenderer.material.color;
         awareColor = new Color(1f, .65f, .11f);
         aggressiveColor = new Color(1.0f, .6f, .5f);
+
+        startPoint = currentWanderPoint;
+        
 
     }
 
@@ -48,23 +54,27 @@ public class Intelligence : MonoBehaviour
     }
     void Wander()
     {
-        if (timerBetweenWander > timeWanderSet)
-        {
-            currentWanderPoint += 1;
-
-            print("wanderPoint: " + currentWanderPoint);
-            timerBetweenWander = 0f;
-            if (currentWanderPoint > wanderPoints.Count - 1)
-            {
-                currentWanderPoint = 0;
-            }
-            agent.SetDestination(wanderPoints[currentWanderPoint].transform.position);
-
-        }
-
-        
         activePoint = wanderPoints[currentWanderPoint];
 
+        currentWanderPoint = Random.Range(0, wanderPoints.Count);
+        
+        if (timerBetweenWander > timeWanderSet)
+        {
+
+            print("wanderPoint: " + activePoint);
+            timerBetweenWander = 0f;
+
+            Quaternion lookAt = Quaternion.LookRotation(activePoint.transform.position - transform.position);
+
+            Quaternion rotation = Quaternion.Slerp(transform.rotation, lookAt, Time.deltaTime * speedOfRotation);
+
+            transform.rotation = rotation;
+
+
+            agent.SetDestination(activePoint.transform.position);
+            //transform.LookAt(activePoint.transform.position, Vector3.forward);
+
+        }
         
     }
 
@@ -80,19 +90,27 @@ public class Intelligence : MonoBehaviour
             timerBetweenWander = 0f;
             materialRenderer.material.color = aggressiveColor;
             agent.SetDestination(player.transform.position);
+            LookAt();
         }
         else if (isAware)
         {
             timerBetweenWander = 0f;
             materialRenderer.material.color = awareColor;
-            transform.LookAt(player.transform.position);
+            LookAt();
         }
         else
         {
             materialRenderer.material.color = passiveColor;
         }
     }
+    void LookAt()
+    {
+        Quaternion lookAt = Quaternion.LookRotation(player.transform.position - objectOfRotation.transform.position);
 
+        Quaternion rotation = Quaternion.Slerp(objectOfRotation.transform.rotation, lookAt, Time.deltaTime * speedOfRotation);
+
+        objectOfRotation.transform.rotation = rotation;
+    }
 
 
     private void OnDrawGizmos()

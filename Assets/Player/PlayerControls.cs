@@ -62,6 +62,24 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Switching"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""74857f8b-0ec3-4505-9f77-dd7355d108af"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FireValue"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""a5c81812-509b-4846-91f1-ef5b107689f3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -152,6 +170,28 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""action"": ""Sprinting"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c3ea6d74-880e-4e52-95b6-cb2b4303b820"",
+                    ""path"": ""<Keyboard>/v"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Switching"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f39ca211-051b-4e01-a187-9cbb99dd4cd4"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""FireValue"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -164,6 +204,8 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         m_Controls_Mouse = m_Controls.FindAction("Mouse", throwIfNotFound: true);
         m_Controls_Jumping = m_Controls.FindAction("Jumping", throwIfNotFound: true);
         m_Controls_Sprinting = m_Controls.FindAction("Sprinting", throwIfNotFound: true);
+        m_Controls_Switching = m_Controls.FindAction("Switching", throwIfNotFound: true);
+        m_Controls_FireValue = m_Controls.FindAction("FireValue", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -227,6 +269,8 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Controls_Mouse;
     private readonly InputAction m_Controls_Jumping;
     private readonly InputAction m_Controls_Sprinting;
+    private readonly InputAction m_Controls_Switching;
+    private readonly InputAction m_Controls_FireValue;
     public struct ControlsActions
     {
         private @PlayerControls m_Wrapper;
@@ -235,6 +279,8 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         public InputAction @Mouse => m_Wrapper.m_Controls_Mouse;
         public InputAction @Jumping => m_Wrapper.m_Controls_Jumping;
         public InputAction @Sprinting => m_Wrapper.m_Controls_Sprinting;
+        public InputAction @Switching => m_Wrapper.m_Controls_Switching;
+        public InputAction @FireValue => m_Wrapper.m_Controls_FireValue;
         public InputActionMap Get() { return m_Wrapper.m_Controls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -256,6 +302,12 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @Sprinting.started -= m_Wrapper.m_ControlsActionsCallbackInterface.OnSprinting;
                 @Sprinting.performed -= m_Wrapper.m_ControlsActionsCallbackInterface.OnSprinting;
                 @Sprinting.canceled -= m_Wrapper.m_ControlsActionsCallbackInterface.OnSprinting;
+                @Switching.started -= m_Wrapper.m_ControlsActionsCallbackInterface.OnSwitching;
+                @Switching.performed -= m_Wrapper.m_ControlsActionsCallbackInterface.OnSwitching;
+                @Switching.canceled -= m_Wrapper.m_ControlsActionsCallbackInterface.OnSwitching;
+                @FireValue.started -= m_Wrapper.m_ControlsActionsCallbackInterface.OnFireValue;
+                @FireValue.performed -= m_Wrapper.m_ControlsActionsCallbackInterface.OnFireValue;
+                @FireValue.canceled -= m_Wrapper.m_ControlsActionsCallbackInterface.OnFireValue;
             }
             m_Wrapper.m_ControlsActionsCallbackInterface = instance;
             if (instance != null)
@@ -272,6 +324,12 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @Sprinting.started += instance.OnSprinting;
                 @Sprinting.performed += instance.OnSprinting;
                 @Sprinting.canceled += instance.OnSprinting;
+                @Switching.started += instance.OnSwitching;
+                @Switching.performed += instance.OnSwitching;
+                @Switching.canceled += instance.OnSwitching;
+                @FireValue.started += instance.OnFireValue;
+                @FireValue.performed += instance.OnFireValue;
+                @FireValue.canceled += instance.OnFireValue;
             }
         }
     }
@@ -282,5 +340,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         void OnMouse(InputAction.CallbackContext context);
         void OnJumping(InputAction.CallbackContext context);
         void OnSprinting(InputAction.CallbackContext context);
+        void OnSwitching(InputAction.CallbackContext context);
+        void OnFireValue(InputAction.CallbackContext context);
     }
 }
