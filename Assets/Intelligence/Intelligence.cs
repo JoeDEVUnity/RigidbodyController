@@ -14,7 +14,9 @@ public class Intelligence : MonoBehaviour
     private Renderer materialRenderer;
     private Color passiveColor, awareColor, aggressiveColor;
 
-    private bool inRange, isAware;
+    public bool inRange { get; private set; } 
+    public bool isAware { get; private set; }
+
     [SerializeField] private float checkRadius;
     public int currentWanderPoint;
     private GameObject activePoint;
@@ -27,6 +29,8 @@ public class Intelligence : MonoBehaviour
 
     private int startPoint;
 
+    private Animator anim;
+
     public List<GameObject> wanderPoints = new List<GameObject>();
 
 
@@ -34,10 +38,11 @@ public class Intelligence : MonoBehaviour
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        materialRenderer = main.GetComponent<Renderer>();
-        passiveColor = materialRenderer.material.color;
-        awareColor = new Color(1f, .65f, .11f);
-        aggressiveColor = new Color(1.0f, .6f, .5f);
+        //materialRenderer = main.GetComponent<Renderer>();
+        //passiveColor = materialRenderer.material.color;
+        //awareColor = new Color(1f, .65f, .11f);
+        //aggressiveColor = new Color(1.0f, .6f, .5f);
+        anim = main.GetComponent<Animator>();
 
         startPoint = currentWanderPoint;
         
@@ -62,20 +67,22 @@ public class Intelligence : MonoBehaviour
         {
 
             print("wanderPoint: " + activePoint);
-            timerBetweenWander = 0f;
 
             Quaternion lookAt = Quaternion.LookRotation(activePoint.transform.position - transform.position);
 
             Quaternion rotation = Quaternion.Slerp(transform.rotation, lookAt, Time.deltaTime * speedOfRotation);
 
             transform.rotation = rotation;
-
-
-            agent.SetDestination(activePoint.transform.position);
             //transform.LookAt(activePoint.transform.position, Vector3.forward);
 
         }
-        
+
+        if(timerBetweenWander > timeWanderSet + .2f)
+        {
+            timerBetweenWander = 0f;
+
+            agent.SetDestination(activePoint.transform.position);
+        }
     }
 
 
@@ -84,24 +91,31 @@ public class Intelligence : MonoBehaviour
         inRange = Physics.CheckSphere(transform.position, checkRadius, playerLayer);
         isAware =  Vector3.Distance(transform.position, player.transform.position) < collisionDistance;
 
+        // Animator values
 
-        if (inRange && isAware)
+        if(agent.velocity != Vector3.zero)
         {
-            timerBetweenWander = 0f;
-            materialRenderer.material.color = aggressiveColor;
-            agent.SetDestination(player.transform.position);
-            LookAt();
-        }
-        else if (isAware)
-        {
-            timerBetweenWander = 0f;
-            materialRenderer.material.color = awareColor;
-            LookAt();
+            anim.SetBool("isWalking", true);
         }
         else
         {
-            materialRenderer.material.color = passiveColor;
+            anim.SetBool("isWalking", false);
         }
+
+
+        if (isAware)
+        {
+            LookAt();
+
+            if (inRange)
+            {
+                 timerBetweenWander = 0f;
+                 //materialRenderer.material.color = aggressiveColor;
+                 agent.SetDestination(player.transform.position);
+            }
+        }
+        
+
     }
     void LookAt()
     {

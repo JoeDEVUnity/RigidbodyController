@@ -189,7 +189,7 @@ public class Movement : MonoBehaviour
         }
         else if (!isGrounded)
         {
-            rb.AddForce((movement * setVelocity) * movementMultiplier * airMultiplier, ForceMode.VelocityChange);
+            rb.AddForce((movement * setVelocity) * airMultiplier, ForceMode.Acceleration);
         }
         else
         {

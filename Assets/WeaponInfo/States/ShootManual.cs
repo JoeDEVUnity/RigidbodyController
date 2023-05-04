@@ -4,12 +4,23 @@ using UnityEngine;
 
 public class ShootManual : MonoBehaviour
 {
+    public bool objectPickup;
+    public float maxPickupDist;
 
-    public RayScript playerRay;
+
+    public LayerMask pickupLayer;
+    public Transform pickupPos;
+    private GameObject heldObj;
+
     public Movement player;
 
-    public float fireTimer;
+    public GameObject playerCam;
 
+    public float pickupForce;
+
+    Ray pickupRay;
+    RaycastHit pickupInfo;
+    Rigidbody heldRB;
     void Awake()
     {
 
@@ -18,13 +29,83 @@ public class ShootManual : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        fireTimer += Time.deltaTime;
-        playerRay.stateTimer += Time.deltaTime;
-        if (player.fireValue > 0 && fireTimer > .5)
+        pickupRay = new Ray(pickupPos.position, pickupPos.forward);
+
+
+        objectPickup = Physics.Raycast(pickupRay, out pickupInfo, maxPickupDist, pickupLayer);
+
+        if(player.fireValue > 0)
         {
-            playerRay.tempBullet = Instantiate(playerRay.bullet, playerRay.pointOut.transform.position, playerRay.pointOut.transform.rotation, null);
-            playerRay.tempBullets.Add(playerRay.tempBullet);
-            fireTimer = 0;
+
+            if(heldObj == null)
+            {
+            
+                if (objectPickup)
+                {
+                    // Pickup Object
+                    PickupOBJ(pickupInfo.transform.gameObject);
+                }
+
+            }
+            if(pickupInfo.transform != null)
+            {
+                // Move object
+
+                MoveObject();
+            }
+
+        
+        }   
+        else if(heldRB != null)
+        {
+            DropOBJ();
+            // Drop Object
         }
+
+
+        void MoveObject()
+        {
+            if(Vector3.Distance(heldObj.transform.position, pickupPos.position) > 3f)
+            {
+                Vector3 moveDirection = (pickupPos.position - heldObj.transform.position);
+                heldRB.AddForce(moveDirection * pickupForce);
+            }
+        }
+
+        void PickupOBJ(GameObject pickupObj)
+        {
+            if (pickupObj.GetComponent<Rigidbody>())
+            {
+                heldRB = pickupObj.GetComponent<Rigidbody>();
+                heldRB.useGravity = false;
+                heldRB.drag = 10.0f;
+                heldRB.constraints = RigidbodyConstraints.FreezeRotation;
+
+                pickupObj.transform.parent = pickupPos;
+                heldObj = pickupObj;
+                
+            }
+        }
+
+        void DropOBJ()
+        {
+
+            heldRB.useGravity = true;
+            heldRB.drag = 1.0f;
+            heldRB.constraints = RigidbodyConstraints.None;
+
+            if(heldObj != null)
+            heldObj.transform.parent = null;
+            heldObj = null;
+            
+            
+        }
+
     }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.DrawRay(pickupPos.position, pickupPos.forward * maxPickupDist);
+    }
+
 }

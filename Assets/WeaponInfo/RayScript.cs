@@ -31,9 +31,18 @@ public class RayScript : MonoBehaviour
 
     public int tempInt;
 
+    Ray rayBullet;
+    public bool hitRay, hitSurface;
+    RaycastHit rayInfo;
+    public float rayDistance;
+    public GameObject hitParticle, blastGO;
+    private float particleTimer;
+
+    public LayerMask collisionLayers;
+
     private void Awake()
     {
-      
+        hitSurface = false;
     }
     void Start()
     {
@@ -50,28 +59,42 @@ public class RayScript : MonoBehaviour
    
     void HandleBullets()
     {
-
-        if (tempBullets.Count > 0)
+        if (tempBullets != null)
         {
-            timer += Time.deltaTime;
-        }
-
-        if (timer > bulletTimer)
-        {
-            if (tempBullets.Count >= 3)
+            if (tempBullets.Count > 0)
             {
-                for (tempInt = 1; tempInt < 4; tempInt++)
-                {
-                    if (tempInt < 2)
-                    {
-                        Destroy(tempBullets[tempInt]);
-                        tempBullets.Remove(tempBullets[tempInt]);
-                    }
-                    print(tempInt);
-                }
+                timer += Time.deltaTime;
             }
-            timer = 0f;
+
+            if (timer > bulletTimer)
+            {
+                if (tempBullets.Count >= 3)
+                {
+                    for (tempInt = 1; tempInt < 4; tempInt++)
+                    {
+                        if (tempInt < 2)
+                        {
+                            Destroy(tempBullets[tempInt]);
+                            tempBullets.Remove(tempBullets[tempInt]);
+                        }
+                        // print(tempInt);
+                    }
+                }
+                timer = 0f;
+            }
+            // Make way for every object to have detection (possibly by accessing bullet script itself?)
+
+
+            hitRay = Physics.Raycast(rayBullet, out rayInfo, rayDistance, collisionLayers);
         }
+
+        if (hitRay)
+        {
+            GameObject tempHitParticle = Instantiate(hitParticle, rayInfo.point, Quaternion.identity);
+            GameObject tempEmissiveBlast = Instantiate(blastGO, rayInfo.point, Quaternion.LookRotation(rayInfo.normal));
+            particleTimer = 0f;
+        }
+
     }
 
 
