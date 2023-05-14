@@ -19,7 +19,7 @@ public class ShootAuto : MonoBehaviour
     {
         fireTimer += Time.deltaTime;
         playerRay.stateTimer += Time.deltaTime;
-        if (player.fireValue > 0 && fireTimer > fireRate)
+        if (player.fireValue > 0 && fireTimer > fireRate && player.currentHeat > 0)
         {
             playerRay.tempBullet = Instantiate(playerRay.bullet, playerRay.pointOut.transform.position, playerRay.pointOut.transform.rotation, null);
             playerRay.tempBullets.Add(playerRay.tempBullet);

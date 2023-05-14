@@ -8,7 +8,6 @@ public class LaserScript : MonoBehaviour
 
     public GameObject bulletObj, bulletSpawn;
 
-    public GameObject chargeEmission;
     private GameObject tempEmission;
 
     private float bulletTimer;
@@ -18,10 +17,11 @@ public class LaserScript : MonoBehaviour
     public Intelligence intel;
 
     public float forceVelocity, yOffset;
-
+    
     // Start is called before the first frame update
     void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player");
         
     }
 
@@ -33,14 +33,7 @@ public class LaserScript : MonoBehaviour
 
         if(intel.isAware)
         {
-            if (bulletTimer > bulletTimerSet - .01)
-            {
-                tempEmission = Instantiate(chargeEmission, bulletSpawn.transform.position, transform.rotation);
 
-
-
-
-            }
 
             if (bulletTimer > bulletTimerSet)
             {

@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class Movement : MonoBehaviour
 {
+    [Header("Input Variables")]
     public Vector2 moveInput;
 
     public Vector2 mouseInput;
@@ -13,6 +14,10 @@ public class Movement : MonoBehaviour
     private Vector3 movement;
     public float isSwitching { get; private set; }
     public float fireValue { get; private set; }
+    public RayScript rayScript;
+
+
+    [Header("Physics Variables")]
 
     public float dragForce = 6f;
 
@@ -33,8 +38,9 @@ public class Movement : MonoBehaviour
     PlayerControls playerControls;
 
     public Transform orientation;
-
     Rigidbody rb;
+
+    [Header("Check Variables")]
 
     public Transform groundCheck;
     public LayerMask groundLayer, wallLayer;
@@ -47,7 +53,10 @@ public class Movement : MonoBehaviour
 
     private float playerHeight;
 
-    public bool wallLeft, wallRight;
+    [Header("Wall Jumping Variables")]
+
+    public bool wallLeft;
+    public bool wallRight;
     public float wallDistance;
     public float forceMultiplier, wallJumpForce, jumpWallForce;
 
@@ -64,11 +73,30 @@ public class Movement : MonoBehaviour
     RaycastHit wallLeftRayOut;
     RaycastHit wallRightRayOut;
 
+    [Header("Slider Variables")]
+
+    public Slider heatSlider;
+    public Slider healthSlider;
+    [SerializeField]
+    private float heatMax, healthMax;
+    public float heatRate;
+    public float currentHeat { get; private set; }
+    public float currentHP;
+    public float regenTimer, regenValue;
+
+
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+
+        currentHeat = heatMax;
+        heatSlider.maxValue = heatMax;
+
+        currentHP = healthMax;
+        healthSlider.maxValue = healthMax;
+
     }
 
     // Update is called once per frame
@@ -80,7 +108,7 @@ public class Movement : MonoBehaviour
         Detections();
         HandleDrag();
         SpeedControl();
-
+        HandleBars();
 
     }
 
@@ -247,6 +275,43 @@ public class Movement : MonoBehaviour
         rb.velocity = new Vector3(rb.velocity.x, jumpVelocity, rb.velocity.z);
     }
 
+
+    // Function made to handle the value of heat, health, etc..
+
+    void HandleBars()
+    {
+        // Cap heatValue
+        heatSlider.value = currentHeat;
+        currentHeat = Mathf.Clamp(currentHeat, 0, heatMax);
+
+        healthSlider.value = currentHP;
+
+        // Regen health only if regen timer is greater than 0
+        regenTimer += Time.deltaTime;
+
+        if(regenTimer > 3 && currentHP < healthMax)
+        {
+            currentHP += regenValue * Time.deltaTime;
+        }
+
+        // When fire Value is instanced, reduce heat by heatRate 
+        
+        if(fireValue > 0 && rayScript.shootingMode == RayScript.ShootingTypes.Automatic && currentHeat > 0)
+        {
+            // Reduce by heatRate
+
+            currentHeat -= heatRate * 2 * Time.deltaTime;
+
+        }
+        else if(currentHeat < heatMax && fireValue == 0)
+        {
+            // Increase by heatRate
+            currentHeat += heatRate * Time.deltaTime;
+        }
+
+        // When taken damage, reduce health by X
+
+    }
 
 
     private void OnEnable()

@@ -2,25 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 public class Intelligence : MonoBehaviour
 {
-
+    [Header("Wander Parameters")]
     private float timerBetweenWander;
 
     public float timeWanderSet, collisionDistance;
 
-    private NavMeshAgent agent;
+    public int currentWanderPoint;
+    private GameObject activePoint;
 
+    public List<GameObject> wanderPoints = new List<GameObject>();
+
+    [Header("Agent Parameters")]
+
+    public NavMeshAgent agent;
+    private LaserScript laserScript;
     private Renderer materialRenderer;
     private Color passiveColor, awareColor, aggressiveColor;
 
     public bool inRange { get; private set; } 
     public bool isAware { get; private set; }
 
-    [SerializeField] private float checkRadius;
-    public int currentWanderPoint;
-    private GameObject activePoint;
+    [Header("Detection Parameters")]
 
+    [SerializeField] private float checkRadius;
     public LayerMask playerLayer;
     public GameObject player;
 
@@ -29,25 +36,37 @@ public class Intelligence : MonoBehaviour
 
     private int startPoint;
 
-    private Animator anim;
+   // private Animator anim;
 
-    public List<GameObject> wanderPoints = new List<GameObject>();
+    public StatsManager stats;
 
+
+    [Header("Physical Values")]
+    public float hpMax, currentHp;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
+    {
+        startPoint = currentWanderPoint;
+        ComponentInstance();
+    }
+
+    // Function made to gather components
+    void ComponentInstance()
     {
         agent = GetComponent<NavMeshAgent>();
-        //materialRenderer = main.GetComponent<Renderer>();
-        //passiveColor = materialRenderer.material.color;
-        //awareColor = new Color(1f, .65f, .11f);
-        //aggressiveColor = new Color(1.0f, .6f, .5f);
-        anim = main.GetComponent<Animator>();
 
-        startPoint = currentWanderPoint;
+       // anim = main.GetComponent<Animator>();
+
+        player = GameObject.FindGameObjectWithTag("Player");
+
+        laserScript = this.GetComponentInChildren<LaserScript>();
+
+        currentHp = hpMax;
         
-
     }
+
+    
 
     // Update is called once per frame
     void Update()
@@ -55,51 +74,54 @@ public class Intelligence : MonoBehaviour
         timerBetweenWander += Time.deltaTime;
         Wander();
         Detections();
-    
     }
+
     void Wander()
     {
-        activePoint = wanderPoints[currentWanderPoint];
+            if(wanderPoints.Count > 0)
+            {
+                activePoint = wanderPoints[currentWanderPoint];
 
-        currentWanderPoint = Random.Range(0, wanderPoints.Count);
+                currentWanderPoint = Random.Range(0, wanderPoints.Count);
         
-        if (timerBetweenWander > timeWanderSet)
-        {
+                if (timerBetweenWander > timeWanderSet)
+                {
 
-            print("wanderPoint: " + activePoint);
+                    print("wanderPoint: " + activePoint);
 
-            Quaternion lookAt = Quaternion.LookRotation(activePoint.transform.position - transform.position);
+                    Quaternion lookAt = Quaternion.LookRotation(activePoint.transform.position - transform.position);
 
-            Quaternion rotation = Quaternion.Slerp(transform.rotation, lookAt, Time.deltaTime * speedOfRotation);
+                    Quaternion rotation = Quaternion.Slerp(transform.rotation, lookAt, Time.deltaTime * speedOfRotation);
 
-            transform.rotation = rotation;
-            //transform.LookAt(activePoint.transform.position, Vector3.forward);
+                    transform.rotation = rotation;
+                    //transform.LookAt(activePoint.transform.position, Vector3.forward);
 
+                }
+
+                if(timerBetweenWander > timeWanderSet + .2f)
+                {
+                    timerBetweenWander = 0f;
+
+                    agent.SetDestination(activePoint.transform.position);
+                }
+            }
         }
-
-        if(timerBetweenWander > timeWanderSet + .2f)
-        {
-            timerBetweenWander = 0f;
-
-            agent.SetDestination(activePoint.transform.position);
-        }
-    }
 
 
     void Detections()
     {
-        inRange = Physics.CheckSphere(transform.position, checkRadius, playerLayer);
+        inRange = Physics.CheckSphere(transform.position, checkRadius, playerLayer) && Vector3.Distance(this.transform.position, player.transform.position) > 8;
         isAware =  Vector3.Distance(transform.position, player.transform.position) < collisionDistance;
 
         // Animator values
 
         if(agent.velocity != Vector3.zero)
         {
-            anim.SetBool("isWalking", true);
+            //anim.SetBool("isWalking", true);
         }
         else
         {
-            anim.SetBool("isWalking", false);
+           // anim.SetBool("isWalking", false);
         }
 
 
@@ -112,6 +134,11 @@ public class Intelligence : MonoBehaviour
                  timerBetweenWander = 0f;
                  //materialRenderer.material.color = aggressiveColor;
                  agent.SetDestination(player.transform.position);
+
+            }
+            else
+            {
+                agent.velocity = Vector3.zero;
             }
         }
         
@@ -136,4 +163,7 @@ public class Intelligence : MonoBehaviour
 
         Gizmos.DrawWireSphere(transform.position, checkRadius);
     }
+    
+
+
 }

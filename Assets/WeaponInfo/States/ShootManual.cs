@@ -13,6 +13,7 @@ public class ShootManual : MonoBehaviour
     private GameObject heldObj;
 
     public Movement player;
+    public RayScript playerRay;
 
     public GameObject playerCam;
 
@@ -21,20 +22,24 @@ public class ShootManual : MonoBehaviour
     Ray pickupRay;
     RaycastHit pickupInfo;
     Rigidbody heldRB;
+
+
     void Awake()
     {
-
+    
     }
 
     // Update is called once per frame
     void Update()
     {
+        playerRay.stateTimer += Time.deltaTime;
+
         pickupRay = new Ray(pickupPos.position, pickupPos.forward);
 
 
         objectPickup = Physics.Raycast(pickupRay, out pickupInfo, maxPickupDist, pickupLayer);
 
-        if(player.fireValue > 0)
+        if(player.fireValue > 0) // pickup obj every 3 seconds
         {
 
             if(heldObj == null)

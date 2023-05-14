@@ -55,6 +55,9 @@ public class RayScript : MonoBehaviour
     {
         HandleBullets();
         HandleStates();
+
+
+
     }
    
     void HandleBullets()
@@ -81,11 +84,17 @@ public class RayScript : MonoBehaviour
                     }
                 }
                 timer = 0f;
+
+
+
+
             }
             // Make way for every object to have detection (possibly by accessing bullet script itself?)
 
-
-            hitRay = Physics.Raycast(rayBullet, out rayInfo, rayDistance, collisionLayers);
+           // foreach(GameObject bullet in tempBullets)
+           // {
+    //            hitRay = Physics.Raycast(rayBullet, out rayInfo, rayDistance, collisionLayers);
+           // }
         }
 
         if (hitRay)
@@ -148,9 +157,6 @@ public class RayScript : MonoBehaviour
 
 
     }
-
-
-
 
     private void OnDrawGizmos()
     {
