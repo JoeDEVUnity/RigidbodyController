@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3772262748386721870}
   - component: {fileID: 5508509547090247958}
   - component: {fileID: 5942289992100315580}
+  - component: {fileID: 1636702598135229348}
   m_Layer: 9
   m_Name: Blast
   m_TagString: Untagged
@@ -3614,7 +3615,7 @@ ParticleSystem:
   CollisionModule:
     enabled: 1
     serializedVersion: 4
-    type: 0
+    type: 1
     collisionMode: 0
     colliderForce: 0
     multiplyColliderForceByParticleSize: 0
@@ -4813,3 +4814,15 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &1636702598135229348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6795204978446600224}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24d85408af708944fb83b264d6c51069, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

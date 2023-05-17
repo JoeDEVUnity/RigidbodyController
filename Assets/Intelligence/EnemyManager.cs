@@ -19,6 +19,8 @@ public class EnemyManager : MonoBehaviour
     public float spawnRadius;
     public bool inRangeForInstance;
 
+    private int maxInstances;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -30,7 +32,7 @@ public class EnemyManager : MonoBehaviour
     {
         inRangeForInstance = Physics.CheckSphere(enemyPoint.position, spawnRadius, playerLayer);
 
-        if (inRangeForInstance)
+        if (inRangeForInstance && maxInstances < 4)
         {
                 timerBeforeInstance += Time.deltaTime;
                 if (timerBeforeInstance > timerSet)
@@ -38,6 +40,7 @@ public class EnemyManager : MonoBehaviour
                     GameObject tempEnemy = Instantiate(enemy, enemyPoint.transform.position, Quaternion.identity);
                     Intelligence intel = tempEnemy.GetComponent<Intelligence>();
                     intel.player = this.player;
+                    maxInstances += 1;
                     timerBeforeInstance = 0;
                 }
             }

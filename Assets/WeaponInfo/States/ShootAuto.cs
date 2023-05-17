@@ -1,13 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using TMPro;
 public class ShootAuto : MonoBehaviour
 {
     public RayScript playerRay;
     public Movement player;
+    public TMP_Text tmp;
 
     public float fireTimer, fireRate;
+
+    public bool setActive;
     // Start is called before the first frame update
     void Awake()
     {
@@ -17,13 +20,20 @@ public class ShootAuto : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        fireTimer += Time.deltaTime;
+        tmp.text = "ATTACK MODE";
+
         playerRay.stateTimer += Time.deltaTime;
-        if (player.fireValue > 0 && fireTimer > fireRate && player.currentHeat > 0)
-        {
-            playerRay.tempBullet = Instantiate(playerRay.bullet, playerRay.pointOut.transform.position, playerRay.pointOut.transform.rotation, null);
-            playerRay.tempBullets.Add(playerRay.tempBullet);
-            fireTimer = 0;
-        }
+
+        // Create an instance of ray particle and disintegrate  
+        playerRay.rayParticle.gameObject.SetActive(player.fireValue > 0 && player.currentHeat > 0);
+
+        
     }
-}
+ 
+
+
+
+
+
+    }
+

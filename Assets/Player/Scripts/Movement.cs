@@ -10,7 +10,7 @@ public class Movement : MonoBehaviour
     public Vector2 mouseInput;
 
     public Vector3 slopeMovement;
-
+    private Vector3 checkPos;
     private Vector3 movement;
     public float isSwitching { get; private set; }
     public float fireValue { get; private set; }
@@ -48,6 +48,8 @@ public class Movement : MonoBehaviour
     public float checkRadius;
     public float jumpVelocity;
     public bool isGrounded;
+    public bool combatEnabled = false;
+    public float combatTimer;
 
     public bool canJump;
 
@@ -97,6 +99,8 @@ public class Movement : MonoBehaviour
         currentHP = healthMax;
         healthSlider.maxValue = healthMax;
 
+        checkPos = transform.position;
+
     }
 
     // Update is called once per frame
@@ -139,13 +143,13 @@ public class Movement : MonoBehaviour
 
     void SpeedControl()
     {
-        if(isSprinting > 0.9)
+        if(isSprinting > 0.9 && !combatEnabled) // only able to sprint if combat not enabled
         {
-            setVelocity = Mathf.Lerp(setVelocity, sprintValue, accel * Time.deltaTime);
+            setVelocity = Mathf.Lerp(setVelocity, sprintValue, accel * Time.deltaTime); // slowly interpolate between original velocity and sprint value
         }
         else
         {
-            setVelocity = Mathf.Lerp(setVelocity, walkSpeed, accel * Time.deltaTime);
+            setVelocity = Mathf.Lerp(setVelocity, walkSpeed, accel * Time.deltaTime); // slowly going back to walkSpeed using original velocity
         }
     }
 
@@ -173,7 +177,7 @@ public class Movement : MonoBehaviour
         // Jumping
         isGrounded = Physics.CheckSphere(groundCheck.transform.position, checkRadius, groundLayer);
         
-        if(jumpValue > 0 && (isGrounded || SlopeCheck())) // Only jump if grounded
+        if(jumpValue > 0 && (isGrounded || SlopeCheck()) && !combatEnabled) // Only jump if grounded and out of combat
         {
             canJump = true;
         }
@@ -186,6 +190,16 @@ public class Movement : MonoBehaviour
         {
             Jump();
         }
+        // Combat
+
+        // As timer is greater than 3, disable combat if the player is not in range
+        if (combatTimer > 3 && combatEnabled)
+        {
+            combatEnabled = false;
+            combatTimer = 0;
+        }
+
+
 
         // Slope
         slopeMovement = Vector3.ProjectOnPlane(movement, slopeHit.normal);
@@ -206,69 +220,89 @@ public class Movement : MonoBehaviour
 
     void HandleMovement()
     {
-
+        // Calculate the movement direction based on input and orientation
         movement = orientation.transform.forward * moveInput.y + orientation.transform.right * moveInput.x;
         movement.y = 0;
-        
 
-        if(!isGrounded && SlopeCheck())
+        // Check if not grounded and meets slope check condition
+        if (!isGrounded && SlopeCheck())
         {
+            // Apply force for slope movement
             rb.AddForce((slopeMovement * setVelocity) * movementMultiplier, ForceMode.Acceleration);
         }
+        // Check if not grounded
         else if (!isGrounded)
         {
+            // Apply force for air movement
             rb.AddForce((movement * setVelocity) * airMultiplier, ForceMode.Acceleration);
         }
         else
         {
+            // Apply force for ground movement
             rb.AddForce((movement * setVelocity) * movementMultiplier, ForceMode.Acceleration);
         }
 
+        // Check if touching left wall and not grounded
         if (wallLeft && !isGrounded)
         {
             rb.useGravity = false;
             Debug.Log("touching Left wall");
+
+            // Apply downward force for wall run
             rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
+
+            // Check if moving forward on the wall and apply forward force
             if (moveInput.y > 0)
             {
                 rb.AddForce(orientation.transform.forward * 2 * forceMultiplier, ForceMode.Acceleration);
             }
+
+            // Handle wall jump force
             if (jumpValue > 0 && wallJumpTimer > 0.1f)
             {
                 Debug.Log("JUMPING LEFT WALL");
 
+                // Apply wall jump forces
                 rb.AddForce(orientation.transform.right * wallJumpForce, ForceMode.Impulse);
                 rb.AddForce(Vector3.up * jumpWallForce, ForceMode.Impulse);
+
+                // Reset wall jump timer
                 wallJumpTimer = 0f;
             }
         }
+        // Check if touching right wall and not grounded
         else if (wallRight && !isGrounded)
         {
             rb.useGravity = false;
             Debug.Log("touching Right wall");
+
+            // Apply downward force for wall run
             rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
+
+            // Check if moving forward on the wall and apply forward force
             if (moveInput.y > 0)
             {
                 rb.AddForce(orientation.transform.forward * 2 * forceMultiplier, ForceMode.Acceleration);
             }
 
-            // Handle wall jumping force jump
-
+            // Handle wall jump force
             if (jumpValue > 0 && wallJumpTimer > 0.1f)
             {
-                Debug.Log("JUMPING RIGHT WALL ");
+                Debug.Log("JUMPING RIGHT WALL");
 
+                // Apply wall jump forces in the opposite direction
                 rb.AddForce(-orientation.transform.right * wallJumpForce, ForceMode.Impulse);
                 rb.AddForce(Vector3.up * jumpWallForce, ForceMode.Impulse);
+
+                // Reset wall jump timer
                 wallJumpTimer = 0f;
             }
-
-        } 
+        }
         else
         {
+            // Enable gravity when not touching any wall or grounded
             rb.useGravity = true;
         }
-
     }
     void Jump()
     {
@@ -310,6 +344,15 @@ public class Movement : MonoBehaviour
         }
 
         // When taken damage, reduce health by X
+        // If player HP less than 1, spawn back to initial checkpoint (restart level)
+
+        if(currentHP <= 1)
+        {
+            transform.position = checkPos;
+            combatEnabled = false;
+            currentHP = healthMax;
+        }
+
 
     }
 

@@ -31,7 +31,6 @@ public class StatsManager : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         hpSlider = GetComponentInChildren<Slider>();
 
-        hpSlider.transform.position = new Vector3(transform.position.x, transform.position.y + 3, transform.position.z);
         //hpSlider.transform.localScale = new Vector3(hpSlider.transform.localScale.x / 20, hpSlider.transform.localScale.y / 20, hpSlider.transform.localScale.z / 10);
 
 
@@ -55,26 +54,7 @@ public class StatsManager : MonoBehaviour
 
         hpSlider.transform.LookAt(player.transform, Vector3.up);
         //intensitySlider.transform.LookAt(player.transform, Vector3.up);
-        
-
-        currentIntensity += Time.deltaTime;
-
-        //intensitySlider.value = currentIntensity;
-
-        if (currentIntensity > intensityTimer && intel.inRange)
-        {
-            coolOffTimer += Time.deltaTime;
-            // Rapid fire
-            laserScript.bulletTimerSet = 0.25f;
-
-            if (coolOffTimer > 2)
-            {
-                // Reset values to 0    
-                laserScript.bulletTimerSet = 2f;
-                currentIntensity = 0f;
-                coolOffTimer = 0f;
-            }
-        }
+       
 
         hpSlider.value = currentHP;
 
@@ -92,9 +72,8 @@ public class StatsManager : MonoBehaviour
         {
             timeBeforeRegen = 0f;
         }
-       
 
-
+        hpSlider.gameObject.SetActive(currentHP < hpMax);
 
 
     }

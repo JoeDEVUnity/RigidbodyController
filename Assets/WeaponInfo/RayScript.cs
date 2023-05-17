@@ -5,12 +5,7 @@ using UnityEngine.UI;
 public class RayScript : MonoBehaviour
 {
     public Movement player;
-    private float timer;
-    public float bulletTimer;
-
-    public GameObject bullet;
-    public GameObject tempBullet;
-
+    private Animator anim;
     public enum ShootingTypes { Automatic, Manual };
 
     public ShootingTypes shootingMode;
@@ -36,78 +31,39 @@ public class RayScript : MonoBehaviour
     RaycastHit rayInfo;
     public float rayDistance;
     public GameObject hitParticle, blastGO;
+    public GameObject rayParticle, pickupParticle;
+    public Renderer rayMat;
+    
     private float particleTimer;
+
+
 
     public LayerMask collisionLayers;
 
     private void Awake()
     {
-        hitSurface = false;
+       // hitSurface = false;
     }
     void Start()
     {
-
+        anim = GetComponent<Animator>();
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        HandleBullets();
+        HandleAnimation();
         HandleStates();
-
-
-
     }
    
-    void HandleBullets()
+
+
+
+    void HandleAnimation()
     {
-        if (tempBullets != null)
-        {
-            if (tempBullets.Count > 0)
-            {
-                timer += Time.deltaTime;
-            }
-
-            if (timer > bulletTimer)
-            {
-                if (tempBullets.Count >= 3)
-                {
-                    for (tempInt = 1; tempInt < 4; tempInt++)
-                    {
-                        if (tempInt < 2)
-                        {
-                            Destroy(tempBullets[tempInt]);
-                            tempBullets.Remove(tempBullets[tempInt]);
-                        }
-                        // print(tempInt);
-                    }
-                }
-                timer = 0f;
-
-
-
-
-            }
-            // Make way for every object to have detection (possibly by accessing bullet script itself?)
-
-           // foreach(GameObject bullet in tempBullets)
-           // {
-    //            hitRay = Physics.Raycast(rayBullet, out rayInfo, rayDistance, collisionLayers);
-           // }
-        }
-
-        if (hitRay)
-        {
-            GameObject tempHitParticle = Instantiate(hitParticle, rayInfo.point, Quaternion.identity);
-            GameObject tempEmissiveBlast = Instantiate(blastGO, rayInfo.point, Quaternion.LookRotation(rayInfo.normal));
-            particleTimer = 0f;
-        }
-
+        anim.SetBool("canRotate", player.fireValue > 0 && player.currentHeat > 0);
     }
-
-
-
     void HandleStates()
     {
         
@@ -157,7 +113,7 @@ public class RayScript : MonoBehaviour
 
 
     }
-
+ 
     private void OnDrawGizmos()
     {
     }

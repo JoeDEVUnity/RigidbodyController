@@ -38,7 +38,7 @@ public class BulletBehavior : MonoBehaviour
             {
 
                 // Reduce player HP
-                playerScript.currentHP -= 5;
+                playerScript.currentHP -= 1;
                 playerScript.regenTimer = 0;
             } 
 

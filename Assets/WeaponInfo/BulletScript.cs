@@ -9,7 +9,7 @@ public class BulletScript : MonoBehaviour
 
     Rigidbody bulletRB;
 
-    private GameObject activeEnemy;
+    public LayerMask activeEnemy;
 
     public bool hitRay;
     public float rayDistance = 4f;
@@ -37,36 +37,16 @@ public class BulletScript : MonoBehaviour
     private void Update()
     {
         rayBullet = new Ray(transform.position, transform.forward);
-
-        Physics.Raycast(rayBullet, out rayInfo, 100);
-        
-        if (Physics.Raycast(rayBullet, out rayInfo, 1))
+        hitRay = Physics.Raycast(rayBullet, out rayInfo, 100, activeEnemy);
+        if (hitRay)
         {
-            StatsManager intelStats = rayInfo.collider.GetComponentInChildren<StatsManager>();
-            if (intelStats != null) // Check if the raycast hits an enemy with the intelligence script attached
-            {
-                intelStats.currentHP -= 1.5f; // Subtract health from the specific enemy instance
-                Destroy(this.gameObject);
-                Debug.Log("Enemy HP: " + intelStats.currentHP);
-
-                if (intelStats.currentHP <= 0)
-                {
-                    // Enemy defeated
-                    Destroy(rayInfo.collider.gameObject);
-                }
-            }
-            Debug.Log("Hit enemy");
+            
         }
 
 
 
     }
 
-    void FixedUpdate()
-    {
-        Vector3 bulletForce = transform.forward * bulletVelocity;
-        bulletRB.AddForce(bulletForce * Time.deltaTime, ForceMode.Impulse);
-    }
 
     private void OnCollisionEnter(Collision other)
     {

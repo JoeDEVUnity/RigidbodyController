@@ -5,6 +5,7 @@ using UnityEngine.AI;
 using UnityEngine.UI;
 public class Intelligence : MonoBehaviour
 {
+    
     [Header("Wander Parameters")]
     private float timerBetweenWander;
 
@@ -17,11 +18,12 @@ public class Intelligence : MonoBehaviour
 
     [Header("Agent Parameters")]
 
+    private Vector3 startSinPos;
     public NavMeshAgent agent;
     private LaserScript laserScript;
     private Renderer materialRenderer;
     private Color passiveColor, awareColor, aggressiveColor;
-
+    public float speed, amplitude, frequency;
     public bool inRange { get; private set; } 
     public bool isAware { get; private set; }
 
@@ -30,6 +32,8 @@ public class Intelligence : MonoBehaviour
     [SerializeField] private float checkRadius;
     public LayerMask playerLayer;
     public GameObject player;
+    Movement playerScript;
+
 
     public GameObject main, objectOfRotation;
     public float speedOfRotation = 10f;
@@ -39,10 +43,6 @@ public class Intelligence : MonoBehaviour
    // private Animator anim;
 
     public StatsManager stats;
-
-
-    [Header("Physical Values")]
-    public float hpMax, currentHp;
 
     // Start is called before the first frame update
     void Awake()
@@ -54,16 +54,16 @@ public class Intelligence : MonoBehaviour
     // Function made to gather components
     void ComponentInstance()
     {
+        startSinPos = main.transform.position + new Vector3(0, 4, 0);
+
         agent = GetComponent<NavMeshAgent>();
 
        // anim = main.GetComponent<Animator>();
 
         player = GameObject.FindGameObjectWithTag("Player");
-
+        playerScript = player.GetComponent<Movement>();
         laserScript = this.GetComponentInChildren<LaserScript>();
 
-        currentHp = hpMax;
-        
     }
 
     
@@ -74,6 +74,26 @@ public class Intelligence : MonoBehaviour
         timerBetweenWander += Time.deltaTime;
         Wander();
         Detections();
+
+        // Calculate the new position based on the sine wave
+        float time = Time.time * speed;
+        float yOffset = amplitude * Mathf.Sin(2f * Mathf.PI * frequency * time);
+        Vector3 newPosition = new Vector3(transform.position.x, 4 + yOffset, transform.position.z);
+
+        // Move the object to the new position
+        transform.position = newPosition;
+
+
+        // HP CHECKER
+        
+
+        if (stats.currentHP <= 1)
+        {
+            playerScript.combatEnabled = false;
+            Destroy(gameObject);
+
+        }
+
     }
 
     void Wander()
@@ -96,7 +116,7 @@ public class Intelligence : MonoBehaviour
                     transform.rotation = rotation;
                     //transform.LookAt(activePoint.transform.position, Vector3.forward);
 
-                }
+                } 
 
                 if(timerBetweenWander > timeWanderSet + .2f)
                 {
@@ -128,20 +148,25 @@ public class Intelligence : MonoBehaviour
         if (isAware)
         {
             LookAt();
-
+            playerScript.combatEnabled = true;
             if (inRange)
             {
-                 timerBetweenWander = 0f;
-                 //materialRenderer.material.color = aggressiveColor;
-                 agent.SetDestination(player.transform.position);
-
+                timerBetweenWander = 0f;
+                //materialRenderer.material.color = aggressiveColor;
+                agent.SetDestination(player.transform.position);
+                
             }
             else
             {
                 agent.velocity = Vector3.zero;
             }
         }
-        
+        else
+        {
+            // Instance a combat timer as the player is not in range,
+            playerScript.combatTimer += Time.deltaTime;
+            
+        }
 
     }
     void LookAt()

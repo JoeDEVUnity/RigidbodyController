@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using TMPro;
 public class ShootManual : MonoBehaviour
 {
     public bool objectPickup;
@@ -14,6 +14,8 @@ public class ShootManual : MonoBehaviour
 
     public Movement player;
     public RayScript playerRay;
+    public TMP_Text tmp;
+
 
     public GameObject playerCam;
 
@@ -26,15 +28,22 @@ public class ShootManual : MonoBehaviour
 
     void Awake()
     {
-    
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Set Text for active mode
+        tmp.text = "PICKUP MODE";
+
+
         playerRay.stateTimer += Time.deltaTime;
 
         pickupRay = new Ray(pickupPos.position, pickupPos.forward);
+        // Material of ray will be yellow
+        playerRay.rayMat.material.color = Color.yellow;
+        // Create an instance of pickup particle and disintegrate after pickupTimer 
+        playerRay.pickupParticle.gameObject.SetActive(player.fireValue > 0 && player.currentHeat > 0);
 
 
         objectPickup = Physics.Raycast(pickupRay, out pickupInfo, maxPickupDist, pickupLayer);
