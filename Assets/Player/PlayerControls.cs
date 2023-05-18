@@ -80,6 +80,15 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""DialogueShow"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""f8927fef-14f5-4a06-9c18-9e670ce6e11d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -192,6 +201,17 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""action"": ""FireValue"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""addbbf86-77d1-4219-8314-184018e70edd"",
+                    ""path"": ""<Keyboard>/h"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""DialogueShow"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -206,6 +226,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         m_Controls_Sprinting = m_Controls.FindAction("Sprinting", throwIfNotFound: true);
         m_Controls_Switching = m_Controls.FindAction("Switching", throwIfNotFound: true);
         m_Controls_FireValue = m_Controls.FindAction("FireValue", throwIfNotFound: true);
+        m_Controls_DialogueShow = m_Controls.FindAction("DialogueShow", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -271,6 +292,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Controls_Sprinting;
     private readonly InputAction m_Controls_Switching;
     private readonly InputAction m_Controls_FireValue;
+    private readonly InputAction m_Controls_DialogueShow;
     public struct ControlsActions
     {
         private @PlayerControls m_Wrapper;
@@ -281,6 +303,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         public InputAction @Sprinting => m_Wrapper.m_Controls_Sprinting;
         public InputAction @Switching => m_Wrapper.m_Controls_Switching;
         public InputAction @FireValue => m_Wrapper.m_Controls_FireValue;
+        public InputAction @DialogueShow => m_Wrapper.m_Controls_DialogueShow;
         public InputActionMap Get() { return m_Wrapper.m_Controls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -308,6 +331,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @FireValue.started -= m_Wrapper.m_ControlsActionsCallbackInterface.OnFireValue;
                 @FireValue.performed -= m_Wrapper.m_ControlsActionsCallbackInterface.OnFireValue;
                 @FireValue.canceled -= m_Wrapper.m_ControlsActionsCallbackInterface.OnFireValue;
+                @DialogueShow.started -= m_Wrapper.m_ControlsActionsCallbackInterface.OnDialogueShow;
+                @DialogueShow.performed -= m_Wrapper.m_ControlsActionsCallbackInterface.OnDialogueShow;
+                @DialogueShow.canceled -= m_Wrapper.m_ControlsActionsCallbackInterface.OnDialogueShow;
             }
             m_Wrapper.m_ControlsActionsCallbackInterface = instance;
             if (instance != null)
@@ -330,6 +356,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @FireValue.started += instance.OnFireValue;
                 @FireValue.performed += instance.OnFireValue;
                 @FireValue.canceled += instance.OnFireValue;
+                @DialogueShow.started += instance.OnDialogueShow;
+                @DialogueShow.performed += instance.OnDialogueShow;
+                @DialogueShow.canceled += instance.OnDialogueShow;
             }
         }
     }
@@ -342,5 +371,6 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         void OnSprinting(InputAction.CallbackContext context);
         void OnSwitching(InputAction.CallbackContext context);
         void OnFireValue(InputAction.CallbackContext context);
+        void OnDialogueShow(InputAction.CallbackContext context);
     }
 }

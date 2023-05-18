@@ -40,8 +40,6 @@ public class Intelligence : MonoBehaviour
 
     private int startPoint;
 
-   // private Animator anim;
-
     public StatsManager stats;
 
     // Start is called before the first frame update
@@ -133,17 +131,7 @@ public class Intelligence : MonoBehaviour
         inRange = Physics.CheckSphere(transform.position, checkRadius, playerLayer) && Vector3.Distance(this.transform.position, player.transform.position) > 8;
         isAware =  Vector3.Distance(transform.position, player.transform.position) < collisionDistance;
 
-        // Animator values
-
-        if(agent.velocity != Vector3.zero)
-        {
-            //anim.SetBool("isWalking", true);
-        }
-        else
-        {
-           // anim.SetBool("isWalking", false);
-        }
-
+        
 
         if (isAware)
         {
