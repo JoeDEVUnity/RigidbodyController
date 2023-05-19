@@ -11,8 +11,6 @@ public class WeaponSway : MonoBehaviour
     public float smooth;
     public float swayMultiplier;
 
-    public float sinMultipler;
-
 
     private void Awake()
     {

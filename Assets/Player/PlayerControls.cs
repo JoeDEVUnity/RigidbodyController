@@ -89,6 +89,15 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Options"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""72919144-c589-41b6-8bd4-939969712f61"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -212,6 +221,17 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                     ""action"": ""DialogueShow"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e6fe7801-238d-4b6e-aec9-20294d5bd41f"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Options"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -227,6 +247,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         m_Controls_Switching = m_Controls.FindAction("Switching", throwIfNotFound: true);
         m_Controls_FireValue = m_Controls.FindAction("FireValue", throwIfNotFound: true);
         m_Controls_DialogueShow = m_Controls.FindAction("DialogueShow", throwIfNotFound: true);
+        m_Controls_Options = m_Controls.FindAction("Options", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -293,6 +314,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Controls_Switching;
     private readonly InputAction m_Controls_FireValue;
     private readonly InputAction m_Controls_DialogueShow;
+    private readonly InputAction m_Controls_Options;
     public struct ControlsActions
     {
         private @PlayerControls m_Wrapper;
@@ -304,6 +326,7 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         public InputAction @Switching => m_Wrapper.m_Controls_Switching;
         public InputAction @FireValue => m_Wrapper.m_Controls_FireValue;
         public InputAction @DialogueShow => m_Wrapper.m_Controls_DialogueShow;
+        public InputAction @Options => m_Wrapper.m_Controls_Options;
         public InputActionMap Get() { return m_Wrapper.m_Controls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -334,6 +357,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @DialogueShow.started -= m_Wrapper.m_ControlsActionsCallbackInterface.OnDialogueShow;
                 @DialogueShow.performed -= m_Wrapper.m_ControlsActionsCallbackInterface.OnDialogueShow;
                 @DialogueShow.canceled -= m_Wrapper.m_ControlsActionsCallbackInterface.OnDialogueShow;
+                @Options.started -= m_Wrapper.m_ControlsActionsCallbackInterface.OnOptions;
+                @Options.performed -= m_Wrapper.m_ControlsActionsCallbackInterface.OnOptions;
+                @Options.canceled -= m_Wrapper.m_ControlsActionsCallbackInterface.OnOptions;
             }
             m_Wrapper.m_ControlsActionsCallbackInterface = instance;
             if (instance != null)
@@ -359,6 +385,9 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
                 @DialogueShow.started += instance.OnDialogueShow;
                 @DialogueShow.performed += instance.OnDialogueShow;
                 @DialogueShow.canceled += instance.OnDialogueShow;
+                @Options.started += instance.OnOptions;
+                @Options.performed += instance.OnOptions;
+                @Options.canceled += instance.OnOptions;
             }
         }
     }
@@ -372,5 +401,6 @@ public partial class @PlayerControls : IInputActionCollection2, IDisposable
         void OnSwitching(InputAction.CallbackContext context);
         void OnFireValue(InputAction.CallbackContext context);
         void OnDialogueShow(InputAction.CallbackContext context);
+        void OnOptions(InputAction.CallbackContext context);
     }
 }

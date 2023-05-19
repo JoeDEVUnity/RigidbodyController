@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using TMPro;
 public class DoorOpener : MonoBehaviour
 {
+
+    public TMP_Text tmp;
 
     public bool isActive, isNeutral;
 
@@ -30,6 +32,10 @@ public class DoorOpener : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // If statements to determine between the active states
+
+        
+
         if (isActive && !isNeutral)
         {
             currentState = DoorStates.Active;
@@ -41,6 +47,11 @@ public class DoorOpener : MonoBehaviour
         else if(isNeutral)
         {
             currentState = DoorStates.Neutral;
+            if(tmp != null)
+            {
+                tmp.text = "Drop the green key onto the platform.";
+                tmp.color = Color.red;
+            }
         }
 
         switch (currentState)
@@ -63,7 +74,13 @@ public class DoorOpener : MonoBehaviour
         // All code that allows access
         isNeutral = false;
         areaRenderer.material.color = new Color(.4f, 1f, .03f, .3f);
+        
+        if (tmp != null)
+        {
+            tmp.text = "<--- Door has opened!";
+            tmp.color = Color.green;
 
+        }
 
         stateTimer += Time.deltaTime;
 

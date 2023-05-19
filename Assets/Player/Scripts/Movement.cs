@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 public class Movement : MonoBehaviour
 {
     [Header("Input Variables")]
@@ -14,6 +15,7 @@ public class Movement : MonoBehaviour
     private Vector3 movement;
     public float isSwitching { get; private set; }
     public float fireValue { get; private set; }
+    public float dialogueValue { get; private set; }
     public RayScript rayScript;
 
 
@@ -99,7 +101,6 @@ public class Movement : MonoBehaviour
         currentHP = healthMax;
         healthSlider.maxValue = healthMax;
 
-        checkPos = transform.position;
 
     }
 
@@ -107,7 +108,6 @@ public class Movement : MonoBehaviour
     void Update()
     {
         playerHeight = transform.localScale.y;
-        wallJumpTimer += Time.deltaTime;
         
         Detections();
         HandleDrag();
@@ -247,7 +247,7 @@ public class Movement : MonoBehaviour
         {
             rb.useGravity = false;
             Debug.Log("touching Left wall");
-
+            wallJumpTimer += Time.deltaTime;
             // Apply downward force for wall run
             rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
 
@@ -258,7 +258,7 @@ public class Movement : MonoBehaviour
             }
 
             // Handle wall jump force
-            if (jumpValue > 0 && wallJumpTimer > 0.1f)
+            if (jumpValue > 0 && wallJumpTimer > .5f)
             {
                 Debug.Log("JUMPING LEFT WALL");
 
@@ -275,6 +275,7 @@ public class Movement : MonoBehaviour
         {
             rb.useGravity = false;
             Debug.Log("touching Right wall");
+            wallJumpTimer += Time.deltaTime;
 
             // Apply downward force for wall run
             rb.AddForce(Vector3.down * wallRunGravity, ForceMode.Force);
@@ -286,7 +287,7 @@ public class Movement : MonoBehaviour
             }
 
             // Handle wall jump force
-            if (jumpValue > 0 && wallJumpTimer > 0.1f)
+            if (jumpValue > 0 && wallJumpTimer > 0.5f)
             {
                 Debug.Log("JUMPING RIGHT WALL");
 
@@ -348,9 +349,9 @@ public class Movement : MonoBehaviour
 
         if(currentHP <= 1)
         {
-            transform.position = checkPos;
-            combatEnabled = false;
-            currentHP = healthMax;
+            // Player died
+            // Reset scene to death scene
+            SceneManager.LoadScene("Death");
         }
 
 
@@ -370,6 +371,8 @@ public class Movement : MonoBehaviour
 
             playerControls.Controls.Switching.performed += i => isSwitching = i.ReadValue<float>();
             playerControls.Controls.FireValue.performed += i => fireValue = i.ReadValue<float>();
+            playerControls.Controls.DialogueShow.performed += i => dialogueValue = i.ReadValue<float>();
+
 
             playerControls.Enable();
         }

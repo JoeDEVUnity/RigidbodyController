@@ -54,8 +54,8 @@ public class StatsManager : MonoBehaviour
 
         hpSlider.transform.LookAt(player.transform, Vector3.up);
         //intensitySlider.transform.LookAt(player.transform, Vector3.up);
-       
-
+        // Controls if the player is pressing V key to access dialogue
+        
         hpSlider.value = currentHP;
 
         if (currentHP < hpMax)

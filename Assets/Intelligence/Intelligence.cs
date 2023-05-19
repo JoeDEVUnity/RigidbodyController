@@ -40,6 +40,8 @@ public class Intelligence : MonoBehaviour
 
     private int startPoint;
 
+    public float maxHP;
+
     public StatsManager stats;
 
     // Start is called before the first frame update
@@ -70,13 +72,13 @@ public class Intelligence : MonoBehaviour
     void Update()
     {
         timerBetweenWander += Time.deltaTime;
-        Wander();
+        Wander(); // NOT USED
         Detections();
 
         // Calculate the new position based on the sine wave
-        float time = Time.time * speed;
-        float yOffset = amplitude * Mathf.Sin(2f * Mathf.PI * frequency * time);
-        Vector3 newPosition = new Vector3(transform.position.x, 4 + yOffset, transform.position.z);
+        float time = Time.time * speed; 
+        float yOffset = amplitude * Mathf.Sin(2f * Mathf.PI * frequency * time); // Sin wave modified by frequency and time 
+        Vector3 newPosition = new Vector3(transform.position.x, -1.5f + yOffset, transform.position.z);
 
         // Move the object to the new position
         transform.position = newPosition;
@@ -85,15 +87,17 @@ public class Intelligence : MonoBehaviour
         // HP CHECKER
         
 
-        if (stats.currentHP <= 1)
+        // Checks if current HP is less than 0.1, then destroys
+        if (stats.currentHP <= 0.1f)
         {
+
             playerScript.combatEnabled = false;
             Destroy(gameObject);
 
         }
 
     }
-
+    // SYSTEM THAT WAS NOT USED -- (works)
     void Wander()
     {
             if(wanderPoints.Count > 0)

@@ -31,6 +31,8 @@ public class LaserScript : MonoBehaviour
 
         bulletTimer += Time.deltaTime;
 
+        if(intel != null)
+        {
         if(intel.isAware)
         {
 
@@ -51,6 +53,8 @@ public class LaserScript : MonoBehaviour
 
                 bulletTimer = 0f;
             } 
+        }
+
         }
 
 
