@@ -1,2 +1,2 @@
 # RigidbodyController
- Complex RB player experiment in Unity
+ Complex RB player experiment in Unity for METATRONIC
