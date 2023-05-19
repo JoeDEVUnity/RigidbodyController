@@ -340,7 +340,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 21, y: -7.399994}
+  m_AnchoredPosition: {x: 21, y: -7.4000244}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &46549451
@@ -8700,8 +8700,8 @@ MonoBehaviour:
   wallRight: 0
   wallDistance: 0.75
   forceMultiplier: 4.84
-  wallJumpForce: 10.39
-  jumpWallForce: 19.4
+  wallJumpForce: 13.5
+  jumpWallForce: 15.92
   wallJump: 1
   heatSlider: {fileID: 1025011186}
   healthSlider: {fileID: 46549451}
@@ -8820,7 +8820,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 28.700012, y: -11}
+  m_AnchoredPosition: {x: 28.700073, y: -11}
   m_SizeDelta: {x: 160, y: 20}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1025011186
